@@ -1,12 +1,13 @@
 /** @format */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { Configuration, PublicClientApplication } from "@azure/msal-browser";
 
 const configuration: Configuration = {
   auth: {
     clientId: "3b965048-bbf1-4cce-8ec8-bf735ee31de5",
+    redirectUri: "http://localhost:3000/login",
   },
 };
 const msalInstance = new PublicClientApplication(configuration);
@@ -33,6 +34,20 @@ function App() {
 
     setToken(result.accessToken);
   };
+
+  useEffect(() => {
+    const accounts = msalInstance.getAllAccounts();
+
+    if (accounts.length > 0) {
+      msalInstance
+        .acquireTokenSilent({
+          scopes: ["user.read"],
+          account: accounts[0],
+        })
+        .then((result) => setToken(result.accessToken))
+        .catch((error) => console.error(error));
+    }
+  }, []);
 
   return (
     <main>
