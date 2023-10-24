@@ -16,18 +16,20 @@ await msalInstance.initialize();
 function App() {
   const [token, setToken] = useState("");
 
-  const accounts = msalInstance.getAllAccounts();
-
   const onClick = async () => {
     const accounts = msalInstance.getAllAccounts();
 
     if (accounts.length > 0) {
       await msalInstance.logoutPopup();
+      setToken("");
 
       return;
     }
 
-    const result = await msalInstance.loginPopup();
+    const result = await msalInstance.loginPopup({
+      scopes: ["user.read"],
+      account: accounts[0],
+    });
 
     setToken(result.accessToken);
   };
